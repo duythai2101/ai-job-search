@@ -9,6 +9,7 @@
     "lint": "cd web/frontend && pnpm run lint"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.10.3",
     "next": "14.2.18",
     "react-hot-toast": "^2.6.0"
   }
