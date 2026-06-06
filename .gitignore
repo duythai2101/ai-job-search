@@ -1,3 +1,9 @@
+# Environment files — NEVER commit real credentials
+.env
+.env.local
+.env.production
+.env.*.local
+
 # Dependencies
 node_modules/
 bun.lock
