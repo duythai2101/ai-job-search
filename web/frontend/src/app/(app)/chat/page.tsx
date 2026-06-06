@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { api } from "@/lib/api";
 import { ChatSession, ChatMessage } from "@/lib/types";
@@ -34,7 +34,7 @@ function MessageBubble({ msg }: { msg: ChatMessage | { role: string; content: st
   );
 }
 
-export default function ChatPage() {
+function ChatContent() {
   const searchParams = useSearchParams();
   const contextType = searchParams.get("context") || "general";
   const contextId = searchParams.get("id") || undefined;
@@ -231,5 +231,13 @@ export default function ChatPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ChatPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center h-full text-gray-500">Đang tải...</div>}>
+      <ChatContent />
+    </Suspense>
   );
 }
