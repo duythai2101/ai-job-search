@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { Toaster } from "react-hot-toast";
 import "./globals.css";
+import ToasterProvider from "@/components/toaster-provider";
 
 const inter = Inter({ subsets: ["latin", "vietnamese"] });
 
@@ -15,7 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="vi">
       <body className={inter.className}>
         {children}
-        <Toaster position="top-right" />
+        <ToasterProvider />
       </body>
     </html>
   );

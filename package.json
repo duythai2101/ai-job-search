@@ -9,6 +9,7 @@
     "lint": "cd web/frontend && pnpm run lint"
   },
   "dependencies": {
-    "next": "14.2.18"
+    "next": "14.2.18",
+    "react-hot-toast": "^2.6.0"
   }
 }
