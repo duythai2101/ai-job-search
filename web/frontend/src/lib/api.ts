@@ -3,10 +3,21 @@ import { createClient } from "./supabase";
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 
 async function getAuthHeader(): Promise<Record<string, string>> {
-  const supabase = createClient();
-  const { data } = await supabase.auth.getSession();
-  const token = data.session?.access_token;
-  return token ? { Authorization: `Bearer ${token}` } : {};
+  try {
+    const supabase = createClient();
+    const { data, error } = await supabase.auth.getSession();
+    
+    if (error) {
+      console.warn("[v0] Session retrieval error:", error.message);
+      return {};
+    }
+    
+    const token = data?.session?.access_token;
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  } catch (error) {
+    console.warn("[v0] Auth header error:", error instanceof Error ? error.message : String(error));
+    return {};
+  }
 }
 
 async function request<T>(

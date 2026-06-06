@@ -37,6 +37,11 @@ export async function middleware(request: NextRequest) {
       return supabaseResponse;
     }
 
+    // User is null when not authenticated - this is not an error state
+    if (!user) {
+      console.log("[v0] No authenticated user");
+    }
+
     const { pathname } = request.nextUrl;
 
     const isAuthPage = pathname.startsWith("/auth");
