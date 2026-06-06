@@ -20,18 +20,11 @@ export default function RegisterPage() {
     }
     setLoading(true);
     const supabase = createClient();
-    console.log("[v0] Signup started - Email:", email);
-    console.log("[v0] Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
-    console.log("[v0] Anon key exists:", !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
-    
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { full_name: fullName } },
     });
-    
-    console.log("[v0] Signup response - Error:", error);
-    
     if (error) {
       toast.error(error.message);
     } else {
