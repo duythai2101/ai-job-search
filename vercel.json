@@ -1,6 +1,6 @@
 {
   "buildCommand": "pnpm run build",
-  "outputDirectory": "web/frontend/.next",
+  "outputDirectory": "web/frontend",
   "framework": "nextjs",
   "regions": ["hkg1"]
 }
