@@ -1,9 +1,19 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Plus_Jakarta_Sans, DM_Sans } from "next/font/google";
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
-import ToasterProvider from "@/components/toaster-provider";
 
-const inter = Inter({ subsets: ["latin", "vietnamese"] });
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin", "vietnamese"],
+  variable: "--font-jakarta",
+  display: "swap",
+});
+
+const dmSans = DM_Sans({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-dm",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "JobViet AI – Tìm việc thông minh",
@@ -12,10 +22,19 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="vi">
-      <body className={inter.className}>
+    <html lang="vi" className={`${jakarta.variable} ${dmSans.variable}`}>
+      <body className="font-sans antialiased">
         {children}
-        <ToasterProvider />
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            style: {
+              fontFamily: "var(--font-dm), system-ui, sans-serif",
+              fontSize: "14px",
+              borderRadius: "10px",
+            },
+          }}
+        />
       </body>
     </html>
   );
