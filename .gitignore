@@ -8,6 +8,10 @@
 node_modules/
 bun.lock
 
+# Next.js build output
+.next/
+out/
+
 # Python
 __pycache__/
 *.pyc
