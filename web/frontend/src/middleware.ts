@@ -30,30 +30,37 @@ export async function middleware(request: NextRequest) {
       },
     });
 
+    let authUser: typeof user | null = null;
     const { data: { user }, error } = await supabase.auth.getUser();
+    authUser = user;
     
     if (error) {
-      console.error("[v0] Auth error:", error.message);
-      return supabaseResponse;
-    }
-
-    // User is null when not authenticated - this is not an error state
-    if (!user) {
-      console.log("[v0] No authenticated user");
+      // Auth session missing is expected for unauthenticated users - not an error
+      if (!error.message.includes("session missing") && !error.message.includes("invalid") && !error.message.includes("expired")) {
+        console.error("[v0] Auth error:", error.message);
+      }
+      // Continue without user - let routing handle unauthenticated access
+      authUser = null;
     }
 
     const { pathname } = request.nextUrl;
 
-    const isAuthPage = pathname.startsWith("/auth");
-    const isPublicPage = pathname === "/";
+    // Public/auth pages that don't require authentication
+    const publicPaths = ["/", "/auth/login", "/auth/register"];
+    const isPublicPath = publicPaths.includes(pathname);
+    
+    // Protected pages that require authentication  
+    const isProtectedPath = !isPublicPath && pathname.startsWith("/(app)") || pathname.startsWith("/dashboard") || pathname.startsWith("/analytics") || pathname.startsWith("/applications") || pathname.startsWith("/chat");
 
-    if (!user && !isAuthPage && !isPublicPage) {
+    // If user is not authenticated and trying to access protected page, redirect to login
+    if (!authUser && isProtectedPath) {
       const url = request.nextUrl.clone();
       url.pathname = "/auth/login";
       return NextResponse.redirect(url);
     }
 
-    if (user && isAuthPage) {
+    // If user is authenticated and trying to access auth pages, redirect to dashboard
+    if (authUser && (pathname === "/auth/login" || pathname === "/auth/register")) {
       const url = request.nextUrl.clone();
       url.pathname = "/dashboard";
       return NextResponse.redirect(url);
