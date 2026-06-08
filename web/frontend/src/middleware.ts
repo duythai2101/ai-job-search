@@ -36,9 +36,7 @@ export async function middleware(request: NextRequest) {
     
     if (error) {
       // Auth session missing is expected for unauthenticated users - not an error
-      if (error.message.includes("session missing") || error.message.includes("invalid") || error.message.includes("expired")) {
-        console.log("[v0] No active session (expected for unauthenticated users)");
-      } else {
+      if (!error.message.includes("session missing") && !error.message.includes("invalid") && !error.message.includes("expired")) {
         console.error("[v0] Auth error:", error.message);
       }
       // Continue without user - let routing handle unauthenticated access
