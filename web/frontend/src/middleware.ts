@@ -30,16 +30,19 @@ export async function middleware(request: NextRequest) {
       },
     });
 
+    let authUser: typeof user | null = null;
     const { data: { user }, error } = await supabase.auth.getUser();
+    authUser = user;
     
     if (error) {
-      console.error("[v0] Auth error:", error.message);
-      return supabaseResponse;
-    }
-
-    // User is null when not authenticated - this is not an error state
-    if (!user) {
-      console.log("[v0] No authenticated user");
+      // Auth session missing is expected for unauthenticated users - not an error
+      if (error.message.includes("session missing") || error.message.includes("invalid") || error.message.includes("expired")) {
+        console.log("[v0] No active session (expected for unauthenticated users)");
+      } else {
+        console.error("[v0] Auth error:", error.message);
+      }
+      // Continue without user - let routing handle unauthenticated access
+      authUser = null;
     }
 
     const { pathname } = request.nextUrl;
@@ -47,13 +50,13 @@ export async function middleware(request: NextRequest) {
     const isAuthPage = pathname.startsWith("/auth");
     const isPublicPage = pathname === "/";
 
-    if (!user && !isAuthPage && !isPublicPage) {
+    if (!authUser && !isAuthPage && !isPublicPage) {
       const url = request.nextUrl.clone();
       url.pathname = "/auth/login";
       return NextResponse.redirect(url);
     }
 
-    if (user && isAuthPage) {
+    if (authUser && isAuthPage) {
       const url = request.nextUrl.clone();
       url.pathname = "/dashboard";
       return NextResponse.redirect(url);
