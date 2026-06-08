@@ -45,16 +45,22 @@ export async function middleware(request: NextRequest) {
 
     const { pathname } = request.nextUrl;
 
-    const isAuthPage = pathname.startsWith("/auth");
-    const isPublicPage = pathname === "/";
+    // Public/auth pages that don't require authentication
+    const publicPaths = ["/", "/auth/login", "/auth/register"];
+    const isPublicPath = publicPaths.includes(pathname);
+    
+    // Protected pages that require authentication  
+    const isProtectedPath = !isPublicPath && pathname.startsWith("/(app)") || pathname.startsWith("/dashboard") || pathname.startsWith("/analytics") || pathname.startsWith("/applications") || pathname.startsWith("/chat");
 
-    if (!authUser && !isAuthPage && !isPublicPage) {
+    // If user is not authenticated and trying to access protected page, redirect to login
+    if (!authUser && isProtectedPath) {
       const url = request.nextUrl.clone();
       url.pathname = "/auth/login";
       return NextResponse.redirect(url);
     }
 
-    if (authUser && isAuthPage) {
+    // If user is authenticated and trying to access auth pages, redirect to dashboard
+    if (authUser && (pathname === "/auth/login" || pathname === "/auth/register")) {
       const url = request.nextUrl.clone();
       url.pathname = "/dashboard";
       return NextResponse.redirect(url);
