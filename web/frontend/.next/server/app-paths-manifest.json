@@ -1,0 +1,15 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/page": "app/page.js",
+  "/(app)/chat/page": "app/(app)/chat/page.js",
+  "/(app)/cv/page": "app/(app)/cv/page.js",
+  "/(app)/analytics/page": "app/(app)/analytics/page.js",
+  "/(app)/applications/page": "app/(app)/applications/page.js",
+  "/(app)/dashboard/page": "app/(app)/dashboard/page.js",
+  "/(app)/jobs/page": "app/(app)/jobs/page.js",
+  "/(app)/jobs/[id]/page": "app/(app)/jobs/[id]/page.js",
+  "/(app)/cv/[id]/page": "app/(app)/cv/[id]/page.js",
+  "/(app)/profile/page": "app/(app)/profile/page.js",
+  "/(auth)/login/page": "app/(auth)/login/page.js",
+  "/(auth)/register/page": "app/(auth)/register/page.js"
+}

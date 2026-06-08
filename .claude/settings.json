@@ -1,7 +1,20 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git check-ignore *)"
+      "Bash(git check-ignore *)",
+      "Bash(npm run *)",
+      "Bash(mkdir -p /Users/phamduythai/ai-job-search/.claude/skills/frontend-design /Users/phamduythai/ai-job-search/.claude/skills/ui-ux-pro-max)",
+      "Edit(/.claude/skills/frontend-design/**)",
+      "Edit(/.claude/skills/ui-ux-pro-max/**)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(gh api *)",
+      "WebFetch(domain:github.com)",
+      "Bash(npm install *)",
+      "Bash(sudo npm install -g uipro-cli)",
+      "Bash(npx uipro-cli *)"
+    ],
+    "additionalDirectories": [
+      "/Users/phamduythai/ai-job-search/.claude/skills"
     ]
   }
 }
