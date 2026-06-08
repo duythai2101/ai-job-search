@@ -40,7 +40,7 @@ export default function RegisterPage() {
             <div className="w-9 h-9 bg-white/10 rounded-xl flex items-center justify-center">
               <Briefcase className="w-5 h-5 text-white" />
             </div>
-            <span className="font-bold text-white text-xl tracking-tight">JobViet AI</span>
+            <span className="font-bold text-white text-xl tracking-tight">Vica</span>
           </Link>
         </div>
         <div className="relative">
@@ -58,7 +58,7 @@ export default function RegisterPage() {
             ))}
           </ul>
         </div>
-        <p className="relative text-primary-400 text-xs font-body">© 2025 JobViet AI · Dành cho sinh viên Việt Nam</p>
+        <p className="relative text-primary-400 text-xs font-body">© 2025 Vica · Dành cho sinh viên Việt Nam</p>
       </div>
 
       <div className="flex-1 flex items-center justify-center px-6 py-12 bg-white">
@@ -67,7 +67,7 @@ export default function RegisterPage() {
             <div className="w-8 h-8 bg-primary-800 rounded-lg flex items-center justify-center">
               <Briefcase className="w-4 h-4 text-white" />
             </div>
-            <span className="font-bold text-slate-900 text-lg">JobViet AI</span>
+            <span className="font-bold text-slate-900 text-lg">Vica</span>
           </div>
           <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight mb-1">Tạo tài khoản</h1>
           <p className="text-slate-500 text-sm mb-8 font-body">Miễn phí 100% · Không cần thẻ tín dụng</p>
