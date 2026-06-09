@@ -11,9 +11,15 @@ app = FastAPI(
     docs_url="/docs" if settings.environment != "production" else None,
 )
 
+_allowed_origins = [
+    o.strip().rstrip("/")
+    for o in settings.frontend_url.split(",")
+    if o.strip()
+] + ["http://localhost:3000", "http://localhost:3001"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.frontend_url, "http://localhost:3000"],
+    allow_origins=_allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
