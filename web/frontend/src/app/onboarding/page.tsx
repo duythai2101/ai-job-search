@@ -10,11 +10,11 @@ import {
   CheckCircle2,
   ChevronRight,
   FileText,
-  Send,
   Sparkles,
   XCircle,
   Upload,
 } from "lucide-react";
+import { PromptInputBox } from "@/components/ui/ai-prompt-box";
 
 type Step = "welcome" | "uploading" | "analyzing" | "review";
 
@@ -150,8 +150,8 @@ export default function OnboardingPage() {
     }
   }, []);
 
-  async function sendMessage() {
-    const text = chatInput.trim();
+  async function sendMessage(overrideText?: string) {
+    const text = (overrideText ?? chatInput).trim();
     if (!text || streaming) return;
     setChatInput("");
     setStreaming(true);
@@ -447,7 +447,8 @@ export default function OnboardingPage() {
         </div>
 
         {/* Right: Chat */}
-        <div className="flex-1 flex flex-col min-w-0">
+        {/* Right: Chat — dark panel */}
+        <div className="flex-1 flex flex-col min-w-0 bg-[#17181A]">
           <div className="flex-1 overflow-y-auto p-5 space-y-3.5">
             {messages.map((msg) => (
               <div
@@ -459,7 +460,7 @@ export default function OnboardingPage() {
                   className={clsx(
                     "max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed",
                     msg.role === "ai"
-                      ? "bg-white border border-slate-100 shadow-sm text-slate-800 rounded-tl-sm whitespace-pre-wrap"
+                      ? "bg-[#1F2023] border border-[#333333] text-gray-200 rounded-tl-sm whitespace-pre-wrap"
                       : "bg-brand-600 text-white rounded-tr-sm"
                   )}
                 >
@@ -468,7 +469,7 @@ export default function OnboardingPage() {
                       {[0, 150, 300].map((d) => (
                         <div
                           key={d}
-                          className="w-1.5 h-1.5 bg-slate-300 rounded-full animate-bounce"
+                          className="w-1.5 h-1.5 bg-[#444] rounded-full animate-bounce"
                           style={{ animationDelay: `${d}ms` }}
                         />
                       ))}
@@ -480,40 +481,30 @@ export default function OnboardingPage() {
             <div ref={messagesEndRef} />
           </div>
 
-          <div className="border-t border-slate-100 p-4 bg-white shrink-0">
-            <div className="flex gap-2">
-              <input
-                ref={chatInputRef}
-                value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
-                placeholder="Hỏi thêm về CV của bạn..."
-                disabled={streaming}
-                className="flex-1 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent disabled:opacity-60 transition-shadow"
-              />
+          {/* Suggestion chips */}
+          <div className="flex gap-2 px-4 pb-3 flex-wrap">
+            {[
+              "CV tôi thiếu gì so với thị trường?",
+              "Cách cải thiện mục kinh nghiệm?",
+              "Tôi nên apply vị trí nào?",
+            ].map((q) => (
               <button
-                onClick={sendMessage}
-                disabled={streaming || !chatInput.trim()}
-                className="bg-brand-600 hover:bg-brand-700 disabled:opacity-40 text-white w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer shrink-0"
+                key={q}
+                onClick={() => { setChatInput(q); }}
+                className="text-xs text-[#9CA3AF] bg-[#1F2023] hover:bg-[#2a2b2e] border border-[#333333] px-3 py-1.5 rounded-full transition-colors cursor-pointer"
               >
-                <Send className="w-4 h-4" />
+                {q}
               </button>
-            </div>
-            <div className="flex gap-2 mt-2 flex-wrap">
-              {[
-                "CV tôi thiếu gì so với thị trường?",
-                "Cách cải thiện mục kinh nghiệm?",
-                "Tôi nên apply vị trí nào?",
-              ].map((q) => (
-                <button
-                  key={q}
-                  onClick={() => { setChatInput(q); chatInputRef.current?.focus(); }}
-                  className="text-xs text-brand-600 bg-brand-50 hover:bg-brand-100 px-3 py-1 rounded-lg transition-colors cursor-pointer"
-                >
-                  {q}
-                </button>
-              ))}
-            </div>
+            ))}
+          </div>
+
+          {/* PromptInputBox */}
+          <div className="px-4 pb-4 shrink-0">
+            <PromptInputBox
+              isLoading={streaming}
+              placeholder="Hỏi thêm về CV của bạn..."
+              onSend={(message) => sendMessage(message)}
+            />
           </div>
         </div>
       </div>
