@@ -1,17 +1,17 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import toast from "react-hot-toast";
-import { User, Mail, Lock, Briefcase, CheckCircle2, ArrowRight } from "lucide-react";
+import { User, Mail, Lock, Briefcase, CheckCircle2, ArrowRight, Inbox, RefreshCw } from "lucide-react";
 
 export default function RegisterPage() {
-  const router = useRouter();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [registered, setRegistered] = useState(false);
+  const [resending, setResending] = useState(false);
 
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
@@ -22,11 +22,68 @@ export default function RegisterPage() {
     if (error) {
       toast.error(error.message);
     } else {
-      toast.success("Đăng ký thành công!");
-      router.push("/onboarding");
-      router.refresh();
+      setRegistered(true);
     }
     setLoading(false);
+  }
+
+  async function resendEmail() {
+    setResending(true);
+    const supabase = createClient();
+    const { error } = await supabase.auth.resend({ type: "signup", email });
+    if (error) toast.error("Không thể gửi lại email");
+    else toast.success("Đã gửi lại email xác thực");
+    setResending(false);
+  }
+
+  if (registered) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-brand-50/30 px-6 font-sans">
+        <div className="w-full max-w-md text-center">
+          <div className="w-20 h-20 rounded-2xl bg-brand-50 border border-brand-100 flex items-center justify-center mx-auto mb-6">
+            <Inbox className="w-9 h-9 text-brand-600" />
+          </div>
+          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight mb-2">Kiểm tra hộp thư của bạn</h1>
+          <p className="text-slate-500 text-sm leading-relaxed mb-2 font-body">
+            Chúng tôi đã gửi email xác thực đến
+          </p>
+          <p className="font-semibold text-slate-800 text-sm mb-6">{email}</p>
+          <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-card text-left mb-6 space-y-3">
+            {[
+              "Mở email từ Vica trong hộp thư",
+              'Nhấn vào nút "Xác thực tài khoản"',
+              "Đăng nhập và bắt đầu sử dụng",
+            ].map((step, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <div className="w-6 h-6 rounded-full bg-brand-600 text-white text-xs font-bold flex items-center justify-center shrink-0">
+                  {i + 1}
+                </div>
+                <span className="text-sm text-slate-700 font-body">{step}</span>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-slate-400 font-body mb-4">
+            Không thấy email? Kiểm tra thư mục spam hoặc
+          </p>
+          <button
+            onClick={resendEmail}
+            disabled={resending}
+            className="flex items-center gap-2 mx-auto text-sm text-brand-600 hover:text-brand-700 font-semibold disabled:opacity-50 cursor-pointer transition-colors"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${resending ? "animate-spin" : ""}`} />
+            {resending ? "Đang gửi lại..." : "Gửi lại email xác thực"}
+          </button>
+          <div className="mt-8 pt-6 border-t border-slate-100">
+            <p className="text-sm text-slate-500 font-body">
+              Đã xác thực?{" "}
+              <Link href="/auth/login" className="text-brand-600 font-semibold hover:text-brand-700 transition-colors">
+                Đăng nhập ngay
+              </Link>
+            </p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
