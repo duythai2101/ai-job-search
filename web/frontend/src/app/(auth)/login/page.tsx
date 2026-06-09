@@ -20,7 +20,9 @@ export default function LoginPage() {
     if (error) {
       toast.error(error.message === "Invalid login credentials" ? "Email hoặc mật khẩu không đúng" : error.message);
     } else {
-      router.push("/dashboard");
+      const { data: { user } } = await supabase.auth.getUser();
+      const destination = user?.user_metadata?.onboarding_completed ? "/dashboard" : "/onboarding";
+      router.push(destination);
       router.refresh();
     }
     setLoading(false);
