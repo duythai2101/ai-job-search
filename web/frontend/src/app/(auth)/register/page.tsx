@@ -23,7 +23,7 @@ export default function RegisterPage() {
       toast.error(error.message);
     } else {
       toast.success("Đăng ký thành công!");
-      router.push("/dashboard");
+      router.push("/onboarding");
       router.refresh();
     }
     setLoading(false);
