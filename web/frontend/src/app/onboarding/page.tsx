@@ -7,7 +7,6 @@ import clsx from "clsx";
 import {
   AlertTriangle,
   ArrowRight,
-  Briefcase,
   CheckCircle2,
   ChevronRight,
   FileText,
@@ -198,11 +197,8 @@ export default function OnboardingPage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-brand-50/30 flex flex-col">
         {/* Top bar */}
         <header className="px-8 py-5 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-brand-600 rounded-xl flex items-center justify-center shadow-btn-brand">
-              <Briefcase className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-bold text-slate-900 text-[17px]">Vica</span>
+          <div className="flex items-center">
+            <span className="font-bold text-slate-900 text-2xl tracking-tight">Vica</span>
           </div>
           <button
             onClick={completeOnboarding}
@@ -342,10 +338,7 @@ export default function OnboardingPage() {
       {/* Header */}
       <header className="h-14 border-b border-slate-100 flex items-center justify-between px-6 shrink-0">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 bg-brand-600 rounded-lg flex items-center justify-center">
-            <Briefcase className="w-3.5 h-3.5 text-white" />
-          </div>
-          <span className="font-bold text-slate-900">Vica</span>
+          <span className="font-bold text-slate-900 text-xl tracking-tight">Vica</span>
           <ChevronRight className="w-4 h-4 text-slate-300" />
           <span className="text-slate-500 text-sm">Phân tích CV</span>
         </div>

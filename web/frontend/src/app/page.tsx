@@ -29,11 +29,8 @@ export default function LandingPage() {
     <div className="min-h-screen bg-white font-sans">
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center">
-              <Briefcase className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-bold text-slate-900 text-lg tracking-tight">Vica</span>
+          <div className="flex items-center">
+            <span className="font-bold text-slate-900 text-2xl tracking-tight">Vica</span>
           </div>
           <div className="flex items-center gap-2">
             <Link href="/auth/login" className="text-slate-600 hover:text-slate-900 px-4 py-2 text-sm font-medium transition-colors duration-150">Đăng nhập</Link>
@@ -184,11 +181,9 @@ export default function LandingPage() {
 
       <footer className="bg-brand-900 border-t border-white/5 py-8 px-6">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-brand-700 rounded-md flex items-center justify-center">
-              <Briefcase className="w-3 h-3 text-white" />
-            </div>
-            <span className="text-white/60 text-sm font-body">Vica · 2025</span>
+          <div className="flex items-center">
+            <span className="font-bold text-white/60 text-base tracking-tight font-sans">Vica</span>
+            <span className="text-white/30 text-sm font-body ml-2">· 2025</span>
           </div>
           <p className="text-white/30 text-xs font-body">VietnamWorks · TopCV · ITviec · CareerViet</p>
         </div>

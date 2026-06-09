@@ -6,7 +6,7 @@ import { createBrowserClient } from "@supabase/ssr";
 import { useEffect, useState } from "react";
 import {
   LayoutDashboard, Search, ClipboardList, FileText,
-  MessageSquare, BarChart3, User, LogOut, Briefcase,
+  MessageSquare, BarChart3, User, LogOut,
 } from "lucide-react";
 
 const navItems = [
@@ -60,11 +60,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <aside className="w-60 bg-white border-r border-slate-100 flex flex-col fixed h-full z-40">
         {/* Brand */}
         <div className="px-5 pt-5 pb-4">
-          <Link href="/dashboard" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 bg-brand-600 rounded-xl flex items-center justify-center shadow-btn-brand transition-transform duration-150 group-hover:scale-105">
-              <Briefcase className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-bold text-slate-900 text-[17px] tracking-tight">Vica</span>
+          <Link href="/dashboard" className="flex items-center group">
+            <span className="font-bold text-slate-900 text-2xl tracking-tight">Vica</span>
           </Link>
         </div>
 
