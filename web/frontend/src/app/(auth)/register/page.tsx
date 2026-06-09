@@ -18,7 +18,14 @@ export default function RegisterPage() {
     if (password.length < 6) { toast.error("Mật khẩu phải có ít nhất 6 ký tự"); return; }
     setLoading(true);
     const supabase = createClient();
-    const { error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: fullName } } });
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: fullName },
+        emailRedirectTo: "https://ai-job-search-seven.vercel.app/login",
+      },
+    });
     if (error) {
       toast.error(error.message);
     } else {
