@@ -22,15 +22,14 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v
 async function getAuthHeader(): Promise<Record<string, string>> {
   try {
     const supabase = createClient();
-    const { data, error } = await supabase.auth.getSession();
-    
-    if (error) {
-      console.warn("[v0] Session retrieval error:", error.message);
-      return {};
-    }
-    
+    const { data } = await supabase.auth.getSession();
     const token = data?.session?.access_token;
-    return token ? { Authorization: `Bearer ${token}` } : {};
+    if (token) return { Authorization: `Bearer ${token}` };
+
+    // Fallback: refreshSession forces the client to rehydrate from cookies/storage
+    const { data: refreshed } = await supabase.auth.refreshSession();
+    const refreshedToken = refreshed?.session?.access_token;
+    return refreshedToken ? { Authorization: `Bearer ${refreshedToken}` } : {};
   } catch (error) {
     console.warn("[v0] Auth header error:", error instanceof Error ? error.message : String(error));
     return {};
