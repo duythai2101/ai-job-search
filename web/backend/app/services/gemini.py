@@ -164,6 +164,40 @@ Hồ sơ ứng viên:
             yield chunk.text
 
 
+async def parse_uploaded_cv(cv_text: str) -> dict:
+    prompt = f"""Bạn là chuyên gia HR với 10 năm kinh nghiệm đánh giá CV. Phân tích chi tiết CV sau.
+
+CV:
+{cv_text[:5000]}
+
+Trả về JSON hợp lệ (KHÔNG có markdown, KHÔNG có ```json):
+{{
+  "name": "tên ứng viên hoặc chuỗi rỗng nếu không tìm thấy",
+  "overall_score": <số từ 0-100>,
+  "summary_message": "Nhận xét tổng thể 2-3 câu bằng tiếng Việt về chất lượng CV",
+  "top_priorities": ["việc cần làm quan trọng nhất", "việc cần làm thứ 2", "việc cần làm thứ 3"],
+  "sections": [
+    {{
+      "id": "<summary|experience|education|skills|projects|certifications|languages|awards>",
+      "title": "<tên hiển thị tiếng Việt>",
+      "content_preview": "<trích dẫn ngắn 1-2 câu từ nội dung gốc>",
+      "score": <số từ 0-10>,
+      "issues": ["vấn đề cụ thể 1", "vấn đề cụ thể 2"],
+      "suggestions": ["gợi ý cải thiện cụ thể 1", "gợi ý cải thiện cụ thể 2"]
+    }}
+  ]
+}}
+
+Lưu ý:
+- Chỉ trả về các section thực sự có trong CV, tối đa 7 sections
+- issues và suggestions phải cụ thể, không chung chung
+- score 8-10: tốt, 5-7: trung bình, 0-4: cần cải thiện ngay"""
+
+    response = _model.generate_content(prompt)
+    raw = _clean_json(response.text)
+    return json.loads(raw)
+
+
 async def generate_market_insights(scraped_jobs: list[dict]) -> dict:
     jobs_sample = json.dumps(scraped_jobs[:50], ensure_ascii=False)
 
