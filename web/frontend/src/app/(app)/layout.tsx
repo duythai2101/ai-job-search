@@ -24,6 +24,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [initials, setInitials] = useState("U");
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     const supabase = createBrowserClient(
@@ -55,62 +56,97 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     router.push("/auth/login");
   };
 
+  // Label that fades/slides in as the rail expands
+  const NavLabel = ({ children }: { children: React.ReactNode }) => (
+    <span
+      className={`whitespace-nowrap overflow-hidden transition-all duration-300 ease-out ${
+        expanded ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-2"
+      }`}
+    >
+      {children}
+    </span>
+  );
+
   return (
     <div className="min-h-screen bg-[#FAFAFA] flex font-sans">
-      <aside className="w-60 bg-white border-r border-slate-200/70 flex flex-col fixed h-full z-40">
+      <aside
+        onMouseEnter={() => setExpanded(true)}
+        onMouseLeave={() => setExpanded(false)}
+        onFocusCapture={() => setExpanded(true)}
+        onBlurCapture={() => setExpanded(false)}
+        className={`fixed h-full z-40 bg-white border-r border-slate-200/70 flex flex-col overflow-hidden transition-[width,box-shadow] duration-300 ease-out ${
+          expanded ? "w-60 shadow-[8px_0_32px_rgba(15,23,42,0.06)]" : "w-[72px]"
+        }`}
+      >
         {/* Brand */}
-        <div className="h-16 px-6 flex items-center border-b border-slate-200/70">
-          <Link href="/dashboard" className="flex items-center">
-            <span className="font-bold text-slate-900 text-xl tracking-tight">Vica</span>
+        <div className="h-16 flex items-center border-b border-slate-200/70 shrink-0 px-[23px]">
+          <Link href="/dashboard" className="flex items-baseline font-bold text-slate-900 text-xl tracking-tight">
+            <span>V</span>
+            <span
+              className={`overflow-hidden transition-all duration-300 ease-out ${
+                expanded ? "opacity-100 max-w-[3rem]" : "opacity-0 max-w-0"
+              }`}
+            >
+              ica
+            </span>
           </Link>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto py-4">
+        <nav className="flex-1 px-3 space-y-1 py-4">
           {navItems.map(({ href, icon: Icon, label }) => {
             const active = pathname === href || pathname.startsWith(href + "/");
             return (
               <Link
                 key={href}
                 href={href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors duration-150 ${
+                title={expanded ? undefined : label}
+                className={`flex items-center gap-3 h-11 px-[15px] rounded-xl text-sm font-medium transition-colors duration-200 ${
                   active
                     ? "bg-slate-900 text-white"
                     : "text-slate-500 hover:text-slate-900 hover:bg-slate-100"
                 }`}
               >
-                <Icon className="w-[17px] h-[17px] shrink-0" />
-                {label}
+                <Icon className="w-[18px] h-[18px] shrink-0" />
+                <NavLabel>{label}</NavLabel>
               </Link>
             );
           })}
         </nav>
 
         {/* Bottom */}
-        <div className="px-3 pb-4 pt-2 border-t border-slate-200/70 space-y-1">
+        <div className="px-3 pb-4 pt-2 border-t border-slate-200/70 space-y-1 shrink-0">
           <Link
             href="/profile"
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors duration-150 ${
+            title={expanded ? undefined : "Hồ sơ cá nhân"}
+            className={`flex items-center gap-3 h-11 px-[15px] rounded-xl text-sm font-medium transition-colors duration-200 ${
               pathname === "/profile"
                 ? "bg-slate-900 text-white"
                 : "text-slate-500 hover:text-slate-900 hover:bg-slate-100"
             }`}
           >
-            <User className="w-[17px] h-[17px] shrink-0" />
-            Hồ sơ cá nhân
+            <User className="w-[18px] h-[18px] shrink-0" />
+            <NavLabel>Hồ sơ cá nhân</NavLabel>
           </Link>
 
-          <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-slate-50 mt-1">
+          <div className="flex items-center gap-2.5 h-14 px-[11px] rounded-xl bg-slate-50">
             <div className="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center text-[11px] font-bold shrink-0 select-none">
               {initials}
             </div>
-            <div className="flex-1 min-w-0">
+            <div
+              className={`flex-1 min-w-0 transition-all duration-300 ease-out ${
+                expanded ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-2"
+              }`}
+            >
               <p className="text-xs font-semibold text-slate-800 truncate leading-tight">{userName || "User"}</p>
               <p className="text-[11px] text-slate-400 truncate leading-tight mt-0.5">{userEmail}</p>
             </div>
             <button
               onClick={handleSignOut}
-              className="text-slate-300 hover:text-slate-900 transition-colors duration-150 cursor-pointer shrink-0 p-1"
+              tabIndex={expanded ? 0 : -1}
+              className={`text-slate-300 hover:text-slate-900 transition-all duration-300 cursor-pointer shrink-0 p-1 ${
+                expanded ? "opacity-100" : "opacity-0 pointer-events-none"
+              }`}
               title="Đăng xuất"
             >
               <LogOut className="w-3.5 h-3.5" />
@@ -119,8 +155,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
-      <main className="ml-60 flex-1 min-h-screen">
-        {children}
+      {/* Content keeps the collapsed rail width — the sidebar expands over it */}
+      <main className="ml-[72px] flex-1 min-h-screen">
+        <div key={pathname} className="animate-page-in">
+          {children}
+        </div>
       </main>
 
       <ChatDock />
