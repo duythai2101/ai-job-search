@@ -12,7 +12,6 @@ import {
   FileText,
   Sparkles,
   XCircle,
-  Upload,
 } from "lucide-react";
 import { PromptInputBox } from "@/components/ui/ai-prompt-box";
 
@@ -185,6 +184,14 @@ export default function OnboardingPage() {
     }
   }
 
+  function handleWelcomeSend(message: string, files?: File[]) {
+    if (files && files.length > 0) {
+      handleFile(files[0]);
+      return;
+    }
+    alert("Hãy đính kèm CV (PDF, DOC, DOCX hoặc TXT) để tôi phân tích nhé!");
+  }
+
   async function completeOnboarding() {
     const supabase = createClient();
     await supabase.auth.updateUser({ data: { onboarding_completed: true } });
@@ -194,7 +201,17 @@ export default function OnboardingPage() {
   // ── Welcome ───────────────────────────────────────────────────
   if (step === "welcome") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-brand-50/30 flex flex-col">
+      <div
+        className="min-h-screen flex flex-col bg-[radial-gradient(125%_125%_at_50%_101%,rgba(245,87,2,1)_10.5%,rgba(245,120,2,1)_16%,rgba(245,140,2,1)_17.5%,rgba(245,170,100,1)_25%,rgba(238,174,202,1)_40%,rgba(202,179,214,1)_65%,rgba(148,201,233,1)_100%)]"
+        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragOver(false);
+          const f = e.dataTransfer.files[0];
+          if (f) handleFile(f);
+        }}
+      >
         {/* Top bar */}
         <header className="px-8 py-5 flex items-center justify-between">
           <div className="flex items-center">
@@ -202,7 +219,7 @@ export default function OnboardingPage() {
           </div>
           <button
             onClick={completeOnboarding}
-            className="text-slate-400 text-sm hover:text-slate-600 transition-colors cursor-pointer"
+            className="text-slate-600 text-sm hover:text-slate-900 transition-colors cursor-pointer"
           >
             Bỏ qua
           </button>
@@ -210,22 +227,22 @@ export default function OnboardingPage() {
 
         {/* Center content */}
         <div className="flex-1 flex items-center justify-center px-6 py-8">
-          <div className="w-full max-w-md">
+          <div className="w-full max-w-[500px]">
             {/* Step indicator */}
             <div className="flex items-center gap-2 justify-center mb-8">
               <div className="flex items-center gap-1.5">
-                <div className="w-6 h-6 rounded-full bg-brand-600 text-white text-xs font-bold flex items-center justify-center">1</div>
-                <span className="text-xs font-medium text-brand-600">Upload CV</span>
+                <div className="w-6 h-6 rounded-full bg-slate-900 text-white text-xs font-bold flex items-center justify-center">1</div>
+                <span className="text-xs font-semibold text-slate-900">Upload CV</span>
               </div>
-              <div className="w-8 h-px bg-slate-200" />
+              <div className="w-8 h-px bg-slate-900/20" />
               <div className="flex items-center gap-1.5">
-                <div className="w-6 h-6 rounded-full bg-slate-200 text-slate-400 text-xs font-bold flex items-center justify-center">2</div>
-                <span className="text-xs font-medium text-slate-400">Phân tích</span>
+                <div className="w-6 h-6 rounded-full bg-white/40 text-slate-500 text-xs font-bold flex items-center justify-center">2</div>
+                <span className="text-xs font-medium text-slate-500">Phân tích</span>
               </div>
-              <div className="w-8 h-px bg-slate-200" />
+              <div className="w-8 h-px bg-slate-900/20" />
               <div className="flex items-center gap-1.5">
-                <div className="w-6 h-6 rounded-full bg-slate-200 text-slate-400 text-xs font-bold flex items-center justify-center">3</div>
-                <span className="text-xs font-medium text-slate-400">Tìm việc</span>
+                <div className="w-6 h-6 rounded-full bg-white/40 text-slate-500 text-xs font-bold flex items-center justify-center">3</div>
+                <span className="text-xs font-medium text-slate-500">Tìm việc</span>
               </div>
             </div>
 
@@ -234,47 +251,26 @@ export default function OnboardingPage() {
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center shrink-0 mt-1 shadow-md">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
-              <div className="bg-white rounded-2xl rounded-tl-sm px-5 py-4 shadow-card border border-slate-100 flex-1">
+              <div className="bg-white/60 backdrop-blur-md rounded-2xl rounded-tl-sm px-5 py-4 shadow-lg border border-white/50 flex-1">
                 <p className="text-slate-800 text-sm leading-relaxed font-medium">
                   Chào {userName || "bạn"}! Tôi là <strong>Vica AI</strong>.
                 </p>
-                <p className="text-slate-600 text-sm leading-relaxed mt-1.5">
-                  Upload CV của bạn để tôi phân tích chi tiết từng mục và chỉ ra cụ thể
-                  những gì cần cải thiện nhé!
+                <p className="text-slate-700 text-sm leading-relaxed mt-1.5">
+                  Đính kèm CV của bạn vào ô bên dưới (hoặc kéo thả vào đây) để tôi phân tích
+                  chi tiết từng mục và chỉ ra cụ thể những gì cần cải thiện nhé!
                 </p>
               </div>
             </div>
 
-            {/* Drop zone */}
-            <div
-              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-              onDragLeave={() => setDragOver(false)}
-              onDrop={(e) => {
-                e.preventDefault();
-                setDragOver(false);
-                const f = e.dataTransfer.files[0];
-                if (f) handleFile(f);
-              }}
-              onClick={() => fileInputRef.current?.click()}
-              className={clsx(
-                "border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all duration-200 select-none",
-                dragOver
-                  ? "border-brand-400 bg-brand-50 scale-[1.01] shadow-md"
-                  : "border-slate-200 bg-white hover:border-brand-300 hover:bg-brand-50/30 hover:shadow-sm"
-              )}
-            >
-              <div className={clsx(
-                "w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 transition-colors",
-                dragOver ? "bg-brand-100" : "bg-brand-50"
-              )}>
-                <Upload className={`w-6 h-6 ${dragOver ? "text-brand-600" : "text-brand-500"}`} />
-              </div>
-              <p className="font-semibold text-slate-800 text-sm">
-                {dragOver ? "Thả file vào đây" : "Kéo thả CV vào đây"}
-              </p>
-              <p className="text-slate-400 text-xs mt-1">hoặc click để chọn file</p>
-              <p className="text-slate-300 text-xs mt-3">PDF · DOC · DOCX · TXT</p>
-            </div>
+            {/* Prompt box (CV upload) */}
+            <PromptInputBox
+              accept=".pdf,.doc,.docx,.txt"
+              attachTooltip="Đính kèm CV"
+              placeholder="Kéo thả CV vào đây hoặc bấm 📎 để chọn file..."
+              className={clsx(dragOver && "border-brand-400 ring-2 ring-brand-400/50 scale-[1.01]")}
+              onSend={handleWelcomeSend}
+            />
+            <p className="text-center text-xs text-slate-600 mt-3">PDF · DOC · DOCX · TXT</p>
             <input
               ref={fileInputRef}
               type="file"
@@ -286,11 +282,11 @@ export default function OnboardingPage() {
               }}
             />
 
-            <p className="text-center text-xs text-slate-400 mt-5">
+            <p className="text-center text-xs text-slate-600 mt-5">
               Hoặc{" "}
               <button
                 onClick={completeOnboarding}
-                className="text-brand-600 hover:underline cursor-pointer font-medium"
+                className="text-slate-900 hover:underline cursor-pointer font-semibold"
               >
                 bỏ qua bước này
               </button>
@@ -305,19 +301,19 @@ export default function OnboardingPage() {
   // ── Uploading / Analyzing ─────────────────────────────────────
   if (step === "uploading" || step === "analyzing") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-brand-50/30 flex flex-col items-center justify-center gap-6">
-        <div className="w-16 h-16 bg-gradient-to-br from-brand-500 to-indigo-600 rounded-2xl flex items-center justify-center animate-pulse shadow-lg shadow-brand-200">
+      <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-[radial-gradient(125%_125%_at_50%_101%,rgba(245,87,2,1)_10.5%,rgba(245,120,2,1)_16%,rgba(245,140,2,1)_17.5%,rgba(245,170,100,1)_25%,rgba(238,174,202,1)_40%,rgba(202,179,214,1)_65%,rgba(148,201,233,1)_100%)]">
+        <div className="w-16 h-16 bg-gradient-to-br from-brand-500 to-indigo-600 rounded-2xl flex items-center justify-center animate-pulse shadow-lg">
           <Sparkles className="w-8 h-8 text-white" />
         </div>
         <div className="text-center">
           <p className="font-semibold text-slate-900 text-base">
             {step === "uploading" ? "Đang tải file lên..." : "AI đang phân tích CV của bạn..."}
           </p>
-          <p className="text-slate-400 text-sm mt-1">
+          <p className="text-slate-600 text-sm mt-1">
             {step === "uploading" ? fileName : "Thường mất 10–20 giây"}
           </p>
         </div>
-        <div className="w-52 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+        <div className="w-52 h-1.5 bg-white/40 rounded-full overflow-hidden">
           <div
             className={clsx(
               "h-full bg-gradient-to-r from-brand-500 to-indigo-500 rounded-full transition-all duration-700",
@@ -325,7 +321,7 @@ export default function OnboardingPage() {
             )}
           />
         </div>
-        <p className="text-xs text-slate-300">
+        <p className="text-xs text-slate-600">
           {step === "analyzing" ? "Đang đọc và chấm điểm từng mục..." : ""}
         </p>
       </div>

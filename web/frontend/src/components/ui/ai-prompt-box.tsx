@@ -2,7 +2,7 @@
 import React from "react";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { ArrowUp, Paperclip, Square, X, StopCircle, Mic, Globe, BrainCog, FolderCode } from "lucide-react";
+import { ArrowUp, Paperclip, Square, X, StopCircle, Mic, Globe, BrainCog, FolderCode, FileText } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const cn = (...classes: (string | undefined | null | false)[]) => classes.filter(Boolean).join(" ");
@@ -279,10 +279,13 @@ export interface PromptInputBoxProps {
   isLoading?: boolean;
   placeholder?: string;
   className?: string;
+  /** File types the paperclip / drag-drop accepts, e.g. ".pdf,.doc,.docx,.txt". Defaults to images only. */
+  accept?: string;
+  attachTooltip?: string;
 }
 
 export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref: React.Ref<HTMLDivElement>) => {
-  const { onSend = () => {}, isLoading = false, placeholder = "Hỏi thêm về CV của bạn...", className } = props;
+  const { onSend = () => {}, isLoading = false, placeholder = "Hỏi thêm về CV của bạn...", className, accept = "image/*", attachTooltip } = props;
   const [input, setInput] = React.useState("");
   const [files, setFiles] = React.useState<File[]>([]);
   const [filePreviews, setFilePreviews] = React.useState<Record<string, string>>({});
@@ -299,21 +302,37 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
     else if (value === "think") { setShowThink((p) => !p); setShowSearch(false); }
   };
 
+  const isAccepted = React.useCallback(
+    (file: File) => {
+      const ext = "." + (file.name.split(".").pop() || "").toLowerCase();
+      return accept
+        .split(",")
+        .map((a) => a.trim().toLowerCase())
+        .some((a) =>
+          a.endsWith("/*") ? file.type.startsWith(a.slice(0, -1)) : a === ext || a === file.type
+        );
+    },
+    [accept]
+  );
+
   const processFile = (file: File) => {
-    if (!file.type.startsWith("image/")) return;
+    if (!isAccepted(file)) return;
     if (file.size > 10 * 1024 * 1024) return;
     setFiles([file]);
-    const reader = new FileReader();
-    reader.onload = (e) => setFilePreviews({ [file.name]: e.target?.result as string });
-    reader.readAsDataURL(file);
+    setFilePreviews({});
+    if (file.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = (e) => setFilePreviews({ [file.name]: e.target?.result as string });
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleDrop = React.useCallback((e: React.DragEvent) => {
     e.preventDefault();
-    const f = Array.from(e.dataTransfer.files).filter((f) => f.type.startsWith("image/"));
+    const f = Array.from(e.dataTransfer.files).filter(isAccepted);
     if (f.length > 0) processFile(f[0]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isAccepted]);
 
   const handlePaste = React.useCallback((e: ClipboardEvent) => {
     const items = e.clipboardData?.items;
@@ -365,11 +384,19 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
           <div className="flex flex-wrap gap-2 p-0 pb-1">
             {files.map((file, i) => (
               <div key={i} className="relative group">
-                {file.type.startsWith("image/") && filePreviews[file.name] && (
+                {file.type.startsWith("image/") && filePreviews[file.name] ? (
                   <div className="w-16 h-16 rounded-xl overflow-hidden cursor-pointer" onClick={() => setSelectedImage(filePreviews[file.name])}>
                     <img src={filePreviews[file.name]} alt={file.name} className="h-full w-full object-cover" />
                     <button onClick={(e) => { e.stopPropagation(); setFiles([]); setFilePreviews({}); }} className="absolute top-1 right-1 rounded-full bg-black/70 p-0.5">
                       <X className="h-3 w-3 text-white" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 rounded-xl border border-[#444444] bg-[#2E3033] pl-2.5 pr-1.5 py-1.5 max-w-[220px]">
+                    <FileText className="h-4 w-4 text-[#9CA3AF] shrink-0" />
+                    <span className="text-xs text-gray-200 truncate">{file.name}</span>
+                    <button onClick={() => { setFiles([]); setFilePreviews({}); }} className="rounded-full p-0.5 hover:bg-gray-600/40 shrink-0">
+                      <X className="h-3 w-3 text-gray-400" />
                     </button>
                   </div>
                 )}
@@ -388,10 +415,10 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
 
         <PromptInputActions className="flex items-center justify-between gap-2 p-0 pt-2">
           <div className={cn("flex items-center gap-1 transition-opacity duration-300", isRecording ? "opacity-0 invisible h-0" : "opacity-100 visible")}>
-            <PromptInputAction tooltip="Đính kèm ảnh">
+            <PromptInputAction tooltip={attachTooltip ?? (accept === "image/*" ? "Đính kèm ảnh" : "Đính kèm file")}>
               <button onClick={() => uploadInputRef.current?.click()} className="flex h-8 w-8 text-[#9CA3AF] cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-gray-600/30 hover:text-[#D1D5DB]" disabled={isRecording}>
                 <Paperclip className="h-5 w-5" />
-                <input ref={uploadInputRef} type="file" className="hidden" accept="image/*" onChange={(e) => { if (e.target.files?.[0]) processFile(e.target.files[0]); if (e.target) e.target.value = ""; }} />
+                <input ref={uploadInputRef} type="file" className="hidden" accept={accept} onChange={(e) => { if (e.target.files?.[0]) processFile(e.target.files[0]); if (e.target) e.target.value = ""; }} />
               </button>
             </PromptInputAction>
 
