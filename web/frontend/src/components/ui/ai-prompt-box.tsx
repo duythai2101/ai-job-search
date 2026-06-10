@@ -282,10 +282,12 @@ export interface PromptInputBoxProps {
   /** File types the paperclip / drag-drop accepts, e.g. ".pdf,.doc,.docx,.txt". Defaults to images only. */
   accept?: string;
   attachTooltip?: string;
+  /** When set, a validated file is handed to this callback immediately instead of being attached. */
+  onFileAdded?: (file: File) => void;
 }
 
 export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref: React.Ref<HTMLDivElement>) => {
-  const { onSend = () => {}, isLoading = false, placeholder = "Hỏi thêm về CV của bạn...", className, accept = "image/*", attachTooltip } = props;
+  const { onSend = () => {}, isLoading = false, placeholder = "Hỏi thêm về CV của bạn...", className, accept = "image/*", attachTooltip, onFileAdded } = props;
   const [input, setInput] = React.useState("");
   const [files, setFiles] = React.useState<File[]>([]);
   const [filePreviews, setFilePreviews] = React.useState<Record<string, string>>({});
@@ -318,6 +320,10 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
   const processFile = (file: File) => {
     if (!isAccepted(file)) return;
     if (file.size > 10 * 1024 * 1024) return;
+    if (onFileAdded) {
+      onFileAdded(file);
+      return;
+    }
     setFiles([file]);
     setFilePreviews({});
     if (file.type.startsWith("image/")) {
@@ -329,6 +335,7 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
 
   const handleDrop = React.useCallback((e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     const f = Array.from(e.dataTransfer.files).filter(isAccepted);
     if (f.length > 0) processFile(f[0]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
