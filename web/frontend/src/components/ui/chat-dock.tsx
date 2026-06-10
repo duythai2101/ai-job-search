@@ -2,10 +2,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { MessageSquare, X, Sparkles } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import clsx from "clsx";
 import { api } from "@/lib/api";
 import { PromptInputBox } from "@/components/ui/ai-prompt-box";
+
+export const CHAT_PANEL_WIDTH = 420;
 
 interface Msg {
   id: string;
@@ -81,9 +82,14 @@ function pageContext(pathname: string): PageContext {
   };
 }
 
-export default function ChatDock() {
+export default function ChatDock({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
   const pathname = usePathname();
-  const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [streaming, setStreaming] = useState(false);
   const [sessionId, setSessionId] = useState<string | undefined>();
@@ -98,10 +104,20 @@ export default function ChatDock() {
   }, [ctx.type, ctx.id]);
 
   useEffect(() => {
-    const handler = () => setOpen(true);
+    const handler = () => onOpenChange(true);
     window.addEventListener("vica:open-chat", handler);
     return () => window.removeEventListener("vica:open-chat", handler);
-  }, []);
+  }, [onOpenChange]);
+
+  // Esc closes the panel
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onOpenChange(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onOpenChange]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -149,110 +165,115 @@ export default function ChatDock() {
 
   return (
     <>
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: 16, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 16, scale: 0.98 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            className="fixed bottom-24 right-6 z-50 w-[400px] max-w-[calc(100vw-3rem)] h-[600px] max-h-[calc(100vh-8rem)] bg-white border border-slate-200 rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+      {/* Side panel — stays mounted, slides in/out */}
+      <aside
+        aria-hidden={!open}
+        className={clsx(
+          "fixed top-0 right-0 h-full z-50 bg-white border-l border-slate-200/70 flex flex-col",
+          "w-[420px] max-w-[100vw] transition-transform duration-300 ease-out",
+          open ? "translate-x-0 shadow-[-8px_0_32px_rgba(15,23,42,0.06)]" : "translate-x-full"
+        )}
+      >
+        {/* Header */}
+        <div className="h-16 px-5 flex items-center justify-between border-b border-slate-200/70 shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center">
+              <Sparkles className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-slate-900 leading-tight">Vica AI</p>
+              <p className="text-[11px] text-slate-400 leading-tight mt-0.5">
+                Đang xem: {ctx.label}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => onOpenChange(false)}
+            className="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+            title="Đóng (Esc)"
           >
-            {/* Header */}
-            <div className="h-14 px-5 flex items-center justify-between border-b border-slate-100 shrink-0">
-              <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-lg bg-slate-900 flex items-center justify-center">
-                  <Sparkles className="w-3.5 h-3.5 text-white" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-slate-900 leading-tight">Vica AI</p>
-                  <p className="text-[11px] text-slate-400 leading-tight">
-                    Đang xem: {ctx.label}
-                  </p>
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto px-5 py-5 space-y-3 scrollbar-thin">
+          {messages.length === 0 ? (
+            <div className="h-full flex flex-col items-center justify-center text-center px-2">
+              <p className="text-sm font-semibold text-slate-900">
+                Hỏi về {ctx.label.toLowerCase()}
+              </p>
+              <p className="text-xs text-slate-400 mt-1 mb-8 leading-relaxed max-w-[260px]">
+                Tôi nắm được ngữ cảnh trang bạn đang xem và trả lời dựa trên đó.
+              </p>
+              <div className="w-full space-y-2">
+                {ctx.prompts.map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => send(p)}
+                    className="w-full text-left text-[13px] text-slate-600 border border-slate-200 hover:border-slate-400 hover:text-slate-900 rounded-xl px-4 py-3 transition-colors cursor-pointer"
+                  >
+                    {p}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            messages.map((msg) => (
+              <div
+                key={msg.id}
+                className={clsx("flex", msg.role === "user" ? "justify-end" : "justify-start")}
+              >
+                <div
+                  className={clsx(
+                    "max-w-[85%] rounded-2xl px-4 py-2.5 text-[13px] leading-relaxed whitespace-pre-wrap",
+                    msg.role === "user"
+                      ? "bg-slate-900 text-white rounded-br-sm"
+                      : "bg-slate-100 text-slate-800 rounded-bl-sm"
+                  )}
+                >
+                  {msg.content || (
+                    <span className="flex gap-1 py-1">
+                      {[0, 150, 300].map((d) => (
+                        <span
+                          key={d}
+                          className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce inline-block"
+                          style={{ animationDelay: `${d}ms` }}
+                        />
+                      ))}
+                    </span>
+                  )}
                 </div>
               </div>
-              <button
-                onClick={() => setOpen(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-50 transition-colors cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
+            ))
+          )}
+          <div ref={endRef} />
+        </div>
 
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
-              {messages.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-center px-4">
-                  <p className="text-sm font-semibold text-slate-900">
-                    Hỏi về {ctx.label.toLowerCase()}
-                  </p>
-                  <p className="text-xs text-slate-400 mt-1 mb-6 leading-relaxed">
-                    Tôi nắm được ngữ cảnh trang bạn đang xem và trả lời dựa trên đó.
-                  </p>
-                  <div className="w-full space-y-2">
-                    {ctx.prompts.map((p) => (
-                      <button
-                        key={p}
-                        onClick={() => send(p)}
-                        className="w-full text-left text-xs text-slate-600 border border-slate-200 hover:border-slate-300 hover:bg-slate-50 rounded-xl px-3.5 py-2.5 transition-colors cursor-pointer"
-                      >
-                        {p}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                messages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={clsx("flex", msg.role === "user" ? "justify-end" : "justify-start")}
-                  >
-                    <div
-                      className={clsx(
-                        "max-w-[85%] rounded-2xl px-3.5 py-2.5 text-[13px] leading-relaxed whitespace-pre-wrap",
-                        msg.role === "user"
-                          ? "bg-slate-900 text-white rounded-br-sm"
-                          : "bg-slate-100 text-slate-800 rounded-bl-sm"
-                      )}
-                    >
-                      {msg.content || (
-                        <span className="flex gap-1 py-1">
-                          {[0, 150, 300].map((d) => (
-                            <span
-                              key={d}
-                              className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce inline-block"
-                              style={{ animationDelay: `${d}ms` }}
-                            />
-                          ))}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                ))
-              )}
-              <div ref={endRef} />
-            </div>
+        {/* Input */}
+        <div className="p-4 border-t border-slate-200/70 shrink-0">
+          <PromptInputBox
+            simple
+            isLoading={streaming}
+            placeholder={`Hỏi về ${ctx.label.toLowerCase()}...`}
+            onSend={(m) => send(m)}
+          />
+        </div>
+      </aside>
 
-            {/* Input */}
-            <div className="p-3 border-t border-slate-100 shrink-0">
-              <PromptInputBox
-                simple
-                isLoading={streaming}
-                placeholder={`Hỏi về ${ctx.label.toLowerCase()}...`}
-                onSend={(m) => send(m)}
-              />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Floating button */}
+      {/* Floating button — fades out while the panel is open */}
       <button
-        onClick={() => setOpen((o) => !o)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-slate-900 hover:bg-slate-800 text-white flex items-center justify-center shadow-lg hover:shadow-xl transition-all cursor-pointer"
+        onClick={() => onOpenChange(true)}
+        tabIndex={open ? -1 : 0}
+        className={clsx(
+          "fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-slate-900 hover:bg-slate-800 text-white",
+          "flex items-center justify-center shadow-lg hover:shadow-xl cursor-pointer",
+          "transition-all duration-300 ease-out",
+          open ? "opacity-0 scale-75 pointer-events-none" : "opacity-100 scale-100"
+        )}
         title="Hỏi Vica AI"
       >
-        {open ? <X className="w-5 h-5" /> : <MessageSquare className="w-5 h-5" />}
+        <MessageSquare className="w-5 h-5" />
       </button>
     </>
   );

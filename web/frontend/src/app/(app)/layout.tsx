@@ -25,6 +25,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [userEmail, setUserEmail] = useState("");
   const [initials, setInitials] = useState("U");
   const [expanded, setExpanded] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
 
   useEffect(() => {
     const supabase = createBrowserClient(
@@ -155,14 +156,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
-      {/* Content keeps the collapsed rail width — the sidebar expands over it */}
-      <main className="ml-[72px] flex-1 min-h-screen">
+      {/* Content keeps the collapsed rail width — the sidebar expands over it.
+          When the chat panel opens, content smoothly yields the right side. */}
+      <main
+        className={`ml-[72px] flex-1 min-h-screen transition-[margin] duration-300 ease-out ${
+          chatOpen ? "lg:mr-[420px]" : "mr-0"
+        }`}
+      >
         <div key={pathname} className="animate-page-in">
           {children}
         </div>
       </main>
 
-      <ChatDock />
+      <ChatDock open={chatOpen} onOpenChange={setChatOpen} />
     </div>
   );
 }
