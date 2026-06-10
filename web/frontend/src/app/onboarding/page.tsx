@@ -13,6 +13,7 @@ import {
   ChevronRight,
   FileText,
   Sparkles,
+  Upload,
   XCircle,
 } from "lucide-react";
 import { PromptInputBox } from "@/components/ui/ai-prompt-box";
@@ -205,7 +206,7 @@ export default function OnboardingPage() {
   if (step === "welcome") {
     return (
       <div
-        className="relative min-h-screen flex flex-col overflow-hidden bg-[radial-gradient(125%_125%_at_50%_101%,rgba(245,87,2,1)_10.5%,rgba(245,120,2,1)_16%,rgba(245,140,2,1)_17.5%,rgba(245,170,100,1)_25%,rgba(238,174,202,1)_40%,rgba(202,179,214,1)_65%,rgba(148,201,233,1)_100%)]"
+        className="relative min-h-screen flex flex-col bg-[#FAFAFA]"
         onDragEnter={(e) => { e.preventDefault(); dragDepth.current += 1; setDragOver(true); }}
         onDragOver={(e) => e.preventDefault()}
         onDragLeave={() => {
@@ -222,64 +223,100 @@ export default function OnboardingPage() {
       >
         {/* Drag overlay */}
         {dragOver && (
-          <div className="absolute inset-0 z-50 bg-white/30 backdrop-blur-sm flex items-center justify-center pointer-events-none">
-            <div className="border-2 border-dashed border-slate-900/30 bg-white/70 rounded-3xl px-14 py-10 text-center shadow-xl">
+          <div className="absolute inset-0 z-50 bg-white/70 backdrop-blur-sm flex items-center justify-center pointer-events-none">
+            <div className="border-2 border-dashed border-slate-400 bg-white rounded-3xl px-14 py-10 text-center shadow-xl">
               <p className="text-slate-900 font-semibold text-lg">Thả CV vào đây</p>
-              <p className="text-slate-500 text-sm mt-1">PDF · DOC · DOCX · TXT</p>
+              <p className="text-slate-400 text-sm mt-1">PDF · DOC · DOCX · TXT</p>
             </div>
           </div>
         )}
 
         {/* Top bar */}
-        <header className="px-8 py-6 flex items-center justify-between">
-          <span className="font-bold text-slate-900 text-2xl tracking-tight">Vica</span>
+        <header className="h-16 px-6 sm:px-10 flex items-center justify-between border-b border-slate-200/70 shrink-0">
+          <span className="font-bold text-slate-900 text-xl tracking-tight">Vica</span>
+          <div className="hidden sm:flex items-baseline gap-1.5 text-xs font-medium tracking-widest">
+            <span className="text-slate-900 font-bold">01</span>
+            <span className="text-slate-300">/ 03</span>
+            <span className="ml-3 text-slate-500 uppercase">Upload CV</span>
+          </div>
           <button
             onClick={completeOnboarding}
-            className="text-slate-500 text-sm hover:text-slate-900 transition-colors cursor-pointer"
+            className="text-slate-400 text-sm hover:text-slate-900 transition-colors cursor-pointer"
           >
             Bỏ qua
           </button>
         </header>
 
-        {/* Center content */}
-        <div className="flex-1 flex items-center justify-center px-6 pb-16">
+        {/* Body: split layout */}
+        <div className="flex-1 w-full grid lg:grid-cols-2 gap-10 lg:gap-20 items-center px-6 sm:px-10 lg:px-16 xl:px-24 py-10">
+          {/* Left: headline + value props */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
-            className="w-full max-w-lg flex flex-col items-center text-center"
           >
-            <span className="text-[11px] font-semibold tracking-widest uppercase text-slate-600 bg-white/40 backdrop-blur-sm border border-white/50 rounded-full px-3.5 py-1.5 mb-8">
-              Bước 1/3 · Upload CV
-            </span>
-
-            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">
-              Chào {userName || "bạn"} 👋
+            <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 tracking-tight leading-[1.12]">
+              Chào {userName || "bạn"}.
+              <br />
+              CV tốt hơn, bắt đầu từ đây.
             </h1>
-            <p className="text-slate-600 text-base mt-3 mb-10 max-w-sm leading-relaxed">
-              Gửi CV của bạn — <strong className="font-semibold text-slate-800">Vica AI</strong>{" "}
-              sẽ phân tích và chỉ ra chính xác những gì cần cải thiện.
+            <p className="text-slate-500 text-base mt-5 max-w-md leading-relaxed">
+              Gửi CV của bạn — <span className="font-semibold text-slate-700">Vica AI</span> sẽ
+              đọc, chấm điểm và chỉ ra chính xác những gì cần cải thiện.
             </p>
 
-            <PromptInputBox
-              className="w-full text-left"
-              accept=".pdf,.doc,.docx,.txt"
-              attachTooltip="Đính kèm CV"
-              placeholder="Đính kèm CV để bắt đầu..."
-              onFileAdded={handleFile}
-              onSend={handleWelcomeSend}
-            />
+            <div className="mt-12 max-w-md border-y border-slate-200 divide-y divide-slate-200">
+              {[
+                ["01", "Chấm điểm tổng thể", "Thang điểm 100 theo tiêu chí nhà tuyển dụng"],
+                ["02", "Phân tích từng mục", "Kinh nghiệm, kỹ năng, học vấn, dự án..."],
+                ["03", "Gợi ý cải thiện cụ thể", "Việc làm được ngay, không chung chung"],
+              ].map(([n, title, desc]) => (
+                <div key={n} className="flex items-baseline gap-5 py-4">
+                  <span className="text-xs font-mono text-slate-400 shrink-0">{n}</span>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">{title}</p>
+                    <p className="text-sm text-slate-500 mt-0.5">{desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
 
-            <p className="text-xs text-slate-500 mt-4">
-              Kéo thả vào trang hoặc{" "}
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="font-semibold text-slate-800 hover:underline cursor-pointer"
-              >
-                chọn file
-              </button>
-              {" "}— PDF, DOC, DOCX, TXT
-            </p>
+          {/* Right: upload panel */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
+            className="w-full"
+          >
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => fileInputRef.current?.click()}
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") fileInputRef.current?.click(); }}
+              className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 flex flex-col lg:min-h-[480px] shadow-sm hover:border-slate-300 hover:shadow transition-all cursor-pointer"
+            >
+              <div className="flex-1 flex flex-col items-center justify-center text-center py-14">
+                <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mb-5">
+                  <Upload className="w-6 h-6 text-slate-600" />
+                </div>
+                <p className="font-semibold text-slate-900">Kéo thả CV vào đây</p>
+                <p className="text-sm text-slate-400 mt-1">hoặc click để chọn file từ máy</p>
+                <p className="text-xs text-slate-300 mt-5 tracking-wide">
+                  PDF · DOC · DOCX · TXT — tối đa 10MB
+                </p>
+              </div>
+              <div onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+                <PromptInputBox
+                  simple
+                  accept=".pdf,.doc,.docx,.txt"
+                  attachTooltip="Đính kèm CV"
+                  placeholder="Đính kèm CV để bắt đầu..."
+                  onFileAdded={handleFile}
+                  onSend={handleWelcomeSend}
+                />
+              </div>
+            </div>
             <input
               ref={fileInputRef}
               type="file"
@@ -290,15 +327,18 @@ export default function OnboardingPage() {
                 if (f) handleFile(f);
               }}
             />
-
-            <button
-              onClick={completeOnboarding}
-              className="text-xs text-slate-500 hover:text-slate-800 underline underline-offset-4 decoration-slate-400/50 transition-colors cursor-pointer mt-12"
-            >
-              Bỏ qua bước này — bạn có thể upload CV sau
-            </button>
           </motion.div>
         </div>
+
+        {/* Footer */}
+        <footer className="py-6 text-center shrink-0">
+          <button
+            onClick={completeOnboarding}
+            className="text-xs text-slate-400 hover:text-slate-700 underline underline-offset-4 decoration-slate-300 transition-colors cursor-pointer"
+          >
+            Bỏ qua bước này — bạn có thể upload CV sau
+          </button>
+        </footer>
       </div>
     );
   }
@@ -306,27 +346,27 @@ export default function OnboardingPage() {
   // ── Uploading / Analyzing ─────────────────────────────────────
   if (step === "uploading" || step === "analyzing") {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-[radial-gradient(125%_125%_at_50%_101%,rgba(245,87,2,1)_10.5%,rgba(245,120,2,1)_16%,rgba(245,140,2,1)_17.5%,rgba(245,170,100,1)_25%,rgba(238,174,202,1)_40%,rgba(202,179,214,1)_65%,rgba(148,201,233,1)_100%)]">
-        <div className="w-16 h-16 bg-gradient-to-br from-brand-500 to-indigo-600 rounded-2xl flex items-center justify-center animate-pulse shadow-lg">
-          <Sparkles className="w-8 h-8 text-white" />
+      <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-[#FAFAFA]">
+        <div className="w-14 h-14 bg-slate-900 rounded-2xl flex items-center justify-center animate-pulse">
+          <Sparkles className="w-7 h-7 text-white" />
         </div>
         <div className="text-center">
           <p className="font-semibold text-slate-900 text-base">
             {step === "uploading" ? "Đang tải file lên..." : "AI đang phân tích CV của bạn..."}
           </p>
-          <p className="text-slate-600 text-sm mt-1">
+          <p className="text-slate-400 text-sm mt-1">
             {step === "uploading" ? fileName : "Thường mất 10–20 giây"}
           </p>
         </div>
-        <div className="w-52 h-1.5 bg-white/40 rounded-full overflow-hidden">
+        <div className="w-52 h-1 bg-slate-200 rounded-full overflow-hidden">
           <div
             className={clsx(
-              "h-full bg-gradient-to-r from-brand-500 to-indigo-500 rounded-full transition-all duration-700",
+              "h-full bg-slate-900 rounded-full transition-all duration-700",
               step === "uploading" ? "w-1/3" : "w-2/3 animate-pulse"
             )}
           />
         </div>
-        <p className="text-xs text-slate-600">
+        <p className="text-xs text-slate-400">
           {step === "analyzing" ? "Đang đọc và chấm điểm từng mục..." : ""}
         </p>
       </div>

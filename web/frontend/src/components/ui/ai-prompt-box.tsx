@@ -284,10 +284,12 @@ export interface PromptInputBoxProps {
   attachTooltip?: string;
   /** When set, a validated file is handed to this callback immediately instead of being attached. */
   onFileAdded?: (file: File) => void;
+  /** Minimal mode: hides the Search/Think/Canvas toggles and voice recording. */
+  simple?: boolean;
 }
 
 export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref: React.Ref<HTMLDivElement>) => {
-  const { onSend = () => {}, isLoading = false, placeholder = "Hỏi thêm về CV của bạn...", className, accept = "image/*", attachTooltip, onFileAdded } = props;
+  const { onSend = () => {}, isLoading = false, placeholder = "Hỏi thêm về CV của bạn...", className, accept = "image/*", attachTooltip, onFileAdded, simple = false } = props;
   const [input, setInput] = React.useState("");
   const [files, setFiles] = React.useState<File[]>([]);
   const [filePreviews, setFilePreviews] = React.useState<Record<string, string>>({});
@@ -429,6 +431,7 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
               </button>
             </PromptInputAction>
 
+            {!simple && (
             <div className="flex items-center">
               <button type="button" onClick={() => handleToggleChange("search")} className={cn("rounded-full transition-all flex items-center gap-1 px-2 py-1 border h-8", showSearch ? "bg-[#1EAEDB]/15 border-[#1EAEDB] text-[#1EAEDB]" : "bg-transparent border-transparent text-[#9CA3AF] hover:text-[#D1D5DB]")}>
                 <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
@@ -479,17 +482,18 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
                 </AnimatePresence>
               </button>
             </div>
+            )}
           </div>
 
-          <PromptInputAction tooltip={isLoading ? "Dừng" : isRecording ? "Dừng ghi âm" : hasContent ? "Gửi" : "Ghi âm"}>
+          <PromptInputAction tooltip={isLoading ? "Dừng" : isRecording ? "Dừng ghi âm" : hasContent ? "Gửi" : simple ? "Gửi" : "Ghi âm"}>
             <Button
               variant="default"
               size="icon"
               className={cn("h-8 w-8 rounded-full transition-all duration-200", isRecording ? "bg-transparent hover:bg-gray-600/30 text-red-500" : hasContent ? "bg-white hover:bg-white/80 text-[#1F2023]" : "bg-transparent hover:bg-gray-600/30 text-[#9CA3AF]")}
-              onClick={() => { if (isRecording) setIsRecording(false); else if (hasContent) handleSubmit(); else setIsRecording(true); }}
-              disabled={isLoading && !hasContent}
+              onClick={() => { if (isRecording) setIsRecording(false); else if (hasContent) handleSubmit(); else if (!simple) setIsRecording(true); }}
+              disabled={(isLoading && !hasContent) || (simple && !hasContent)}
             >
-              {isLoading ? <Square className="h-4 w-4 fill-[#1F2023] animate-pulse" /> : isRecording ? <StopCircle className="h-5 w-5 text-red-500" /> : hasContent ? <ArrowUp className="h-4 w-4 text-[#1F2023]" /> : <Mic className="h-5 w-5" />}
+              {isLoading ? <Square className="h-4 w-4 fill-[#1F2023] animate-pulse" /> : isRecording ? <StopCircle className="h-5 w-5 text-red-500" /> : hasContent ? <ArrowUp className="h-4 w-4 text-[#1F2023]" /> : simple ? <ArrowUp className="h-4 w-4" /> : <Mic className="h-5 w-5" />}
             </Button>
           </PromptInputAction>
         </PromptInputActions>
