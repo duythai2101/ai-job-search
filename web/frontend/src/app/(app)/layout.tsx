@@ -6,15 +6,15 @@ import { createBrowserClient } from "@supabase/ssr";
 import { useEffect, useState } from "react";
 import {
   LayoutDashboard, Search, ClipboardList, FileText,
-  MessageSquare, BarChart3, User, LogOut,
+  BarChart3, User, LogOut,
 } from "lucide-react";
+import ChatDock from "@/components/ui/chat-dock";
 
 const navItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Tổng quan" },
   { href: "/jobs",      icon: Search,           label: "Tìm việc" },
   { href: "/applications", icon: ClipboardList, label: "Ứng tuyển" },
   { href: "/cv",        icon: FileText,          label: "CV Builder" },
-  { href: "/chat",      icon: MessageSquare,     label: "AI Chat" },
   { href: "/analytics", icon: BarChart3,         label: "Thị trường" },
 ];
 
@@ -56,27 +56,27 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex font-sans">
-      <aside className="w-60 bg-white border-r border-slate-100 flex flex-col fixed h-full z-40">
+    <div className="min-h-screen bg-[#FAFAFA] flex font-sans">
+      <aside className="w-60 bg-white border-r border-slate-200/70 flex flex-col fixed h-full z-40">
         {/* Brand */}
-        <div className="px-5 pt-5 pb-4">
-          <Link href="/dashboard" className="flex items-center group">
-            <span className="font-bold text-slate-900 text-2xl tracking-tight">Vica</span>
+        <div className="h-16 px-6 flex items-center border-b border-slate-200/70">
+          <Link href="/dashboard" className="flex items-center">
+            <span className="font-bold text-slate-900 text-xl tracking-tight">Vica</span>
           </Link>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto py-2">
+        <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto py-4">
           {navItems.map(({ href, icon: Icon, label }) => {
             const active = pathname === href || pathname.startsWith(href + "/");
             return (
               <Link
                 key={href}
                 href={href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors duration-150 ${
                   active
-                    ? "bg-brand-600 text-white shadow-sm"
-                    : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
+                    ? "bg-slate-900 text-white"
+                    : "text-slate-500 hover:text-slate-900 hover:bg-slate-100"
                 }`}
               >
                 <Icon className="w-[17px] h-[17px] shrink-0" />
@@ -87,13 +87,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </nav>
 
         {/* Bottom */}
-        <div className="px-3 pb-4 pt-2 border-t border-slate-100 space-y-1">
+        <div className="px-3 pb-4 pt-2 border-t border-slate-200/70 space-y-1">
           <Link
             href="/profile"
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors duration-150 ${
               pathname === "/profile"
-                ? "bg-brand-600 text-white"
-                : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
+                ? "bg-slate-900 text-white"
+                : "text-slate-500 hover:text-slate-900 hover:bg-slate-100"
             }`}
           >
             <User className="w-[17px] h-[17px] shrink-0" />
@@ -101,7 +101,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </Link>
 
           <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-slate-50 mt-1">
-            <div className="w-8 h-8 rounded-lg bg-brand-600 text-white flex items-center justify-center text-[11px] font-bold shrink-0 select-none">
+            <div className="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center text-[11px] font-bold shrink-0 select-none">
               {initials}
             </div>
             <div className="flex-1 min-w-0">
@@ -110,7 +110,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </div>
             <button
               onClick={handleSignOut}
-              className="text-slate-300 hover:text-red-500 transition-colors duration-150 cursor-pointer shrink-0 p-1"
+              className="text-slate-300 hover:text-slate-900 transition-colors duration-150 cursor-pointer shrink-0 p-1"
               title="Đăng xuất"
             >
               <LogOut className="w-3.5 h-3.5" />
@@ -122,6 +122,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <main className="ml-60 flex-1 min-h-screen">
         {children}
       </main>
+
+      <ChatDock />
     </div>
   );
 }

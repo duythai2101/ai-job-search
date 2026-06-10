@@ -46,7 +46,7 @@ export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
     // App pages (require auth + completed onboarding)
-    const APP_PREFIXES = ["/dashboard", "/analytics", "/applications", "/chat", "/jobs", "/cv", "/profile"];
+    const APP_PREFIXES = ["/dashboard", "/analytics", "/applications", "/jobs", "/cv", "/profile"];
     const isAppPath = APP_PREFIXES.some((p) => pathname.startsWith(p));
     const isProtectedPath = isAppPath || pathname.startsWith("/onboarding");
     const isAuthPage = ["/auth/login", "/auth/register", "/login", "/register"].includes(pathname);
