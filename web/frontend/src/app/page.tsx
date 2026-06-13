@@ -476,39 +476,34 @@ function BentoFeatures() {
         </div>
       </BentoCard>
 
-      {/* AI chat — wide card */}
-      <BentoCard className="md:col-span-2" delay={0.12}>
-        <div className="flex flex-col sm:flex-row gap-8 items-start">
-          <div className="flex-1">
-            <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center mb-5">
-              <MessageSquare className="w-[18px] h-[18px] text-blue-600" />
-            </div>
-            <h3 className="font-semibold text-slate-900 text-lg mb-2">AI đồng hành mọi trang</h3>
-            <p className="text-slate-500 text-sm leading-relaxed">
-              Trợ lý AI hiểu ngữ cảnh trang bạn đang xem — hỏi về việc làm, CV
-              hay chiến lược phỏng vấn ngay tại chỗ, không cần chuyển trang.
-            </p>
-          </div>
-          <div className="w-full sm:w-72 space-y-2 shrink-0">
-            <motion.div
-              initial={{ opacity: 0, x: 16 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.3, ease }}
-              className="ml-auto w-fit max-w-full bg-slate-900 text-white text-[12px] rounded-2xl rounded-br-sm px-4 py-2.5"
-            >
-              Tôi có phù hợp với việc này không?
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, x: -16 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.5, ease }}
-              className="w-fit max-w-full bg-slate-100 text-slate-700 text-[12px] rounded-2xl rounded-bl-sm px-4 py-2.5"
-            >
-              Rất phù hợp — kỹ năng React của bạn khớp 86%. Nên nhấn mạnh dự án gần nhất trong CV.
-            </motion.div>
-          </div>
+      {/* AI chat */}
+      <BentoCard delay={0.12}>
+        <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center mb-5">
+          <MessageSquare className="w-[18px] h-[18px] text-blue-600" />
+        </div>
+        <h3 className="font-semibold text-slate-900 text-lg mb-2">AI đồng hành mọi trang</h3>
+        <p className="text-slate-500 text-sm leading-relaxed mb-5">
+          Trợ lý AI hiểu ngữ cảnh trang bạn đang xem — hỏi đáp ngay tại chỗ, không cần chuyển trang.
+        </p>
+        <div className="space-y-2">
+          <motion.div
+            initial={{ opacity: 0, x: 16 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.3, ease }}
+            className="ml-auto w-fit max-w-[90%] bg-slate-900 text-white text-[12px] rounded-2xl rounded-br-sm px-4 py-2.5"
+          >
+            Tôi có phù hợp với việc này không?
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, x: -16 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.5, ease }}
+            className="w-fit max-w-[90%] bg-slate-100 text-slate-700 text-[12px] rounded-2xl rounded-bl-sm px-4 py-2.5"
+          >
+            Rất phù hợp — kỹ năng React khớp 86%. Nên nhấn mạnh dự án gần nhất.
+          </motion.div>
         </div>
       </BentoCard>
     </div>
