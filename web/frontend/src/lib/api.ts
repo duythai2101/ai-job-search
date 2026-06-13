@@ -19,6 +19,27 @@ export interface CVAnalysisResult {
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 
+/**
+ * Mock mode — render the whole UI with sample data, no backend needed.
+ * Enable via NEXT_PUBLIC_USE_MOCK=1, or visit any page with ?mock=1
+ * (persists in localStorage; ?mock=0 disables), or run
+ * localStorage.setItem("vica:mock","1") in the console.
+ */
+function mockEnabled(): boolean {
+  if (process.env.NEXT_PUBLIC_USE_MOCK === "1") return true;
+  if (typeof window === "undefined") return false;
+  try {
+    const flag = new URLSearchParams(window.location.search).get("mock");
+    if (flag === "1") window.localStorage.setItem("vica:mock", "1");
+    if (flag === "0") window.localStorage.removeItem("vica:mock");
+    return window.localStorage.getItem("vica:mock") === "1";
+  } catch {
+    return false;
+  }
+}
+
+const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 async function getAuthHeader(): Promise<Record<string, string>> {
   try {
     const supabase = createClient();
@@ -40,6 +61,13 @@ async function request<T>(
   path: string,
   options: RequestInit = {}
 ): Promise<T> {
+  if (mockEnabled()) {
+    const { resolveMock } = await import("./mock-data");
+    const body = typeof options.body === "string" ? JSON.parse(options.body) : undefined;
+    await delay(220);
+    return resolveMock(options.method || "GET", path, body) as T;
+  }
+
   const authHeader = await getAuthHeader();
   const res = await fetch(`${BASE_URL}${path}`, {
     ...options,
@@ -72,6 +100,10 @@ export const api = {
     context_type?: string;
     context_id?: string;
   }): Promise<{ reader: ReadableStreamDefaultReader<Uint8Array>; sessionId: string }> {
+    if (mockEnabled()) {
+      const { mockStreamReply } = await import("./mock-data");
+      return { reader: mockStreamReply(body.message, body.context_type), sessionId: body.session_id || `mock-${Date.now()}` };
+    }
     const authHeader = await getAuthHeader();
     const res = await fetch(`${BASE_URL}/chat/send`, {
       method: "POST",
@@ -84,6 +116,11 @@ export const api = {
   },
 
   async uploadCv(file: File): Promise<CVAnalysisResult> {
+    if (mockEnabled()) {
+      const { mockCvAnalysis } = await import("./mock-data");
+      await delay(1200);
+      return mockCvAnalysis;
+    }
     const authHeader = await getAuthHeader();
     const formData = new FormData();
     formData.append("file", file);
@@ -100,6 +137,16 @@ export const api = {
   },
 
   async downloadPdf(cvId: string): Promise<void> {
+    if (mockEnabled()) {
+      const blob = new Blob([`Mock CV PDF (${cvId})`], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `cv-${cvId}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+      return;
+    }
     const authHeader = await getAuthHeader();
     const res = await fetch(`${BASE_URL}/cv/${cvId}/pdf`, { headers: authHeader });
     if (!res.ok) throw new Error("PDF error");
