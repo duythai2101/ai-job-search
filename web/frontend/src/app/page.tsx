@@ -134,7 +134,7 @@ function HeroScene() {
       onMouseMove={onMouseMove}
       onMouseLeave={onMouseLeave}
       style={{ perspective: 1500, y: sceneY }}
-      className="relative mx-auto mt-24 max-w-4xl px-6"
+      className="relative mx-auto mt-16 w-full max-w-5xl px-6"
     >
       {/* Glow under the scene */}
       <div className="absolute inset-x-10 top-10 bottom-0 bg-blue-500/20 blur-[100px] rounded-full pointer-events-none" />
@@ -328,7 +328,7 @@ function BentoCard({
       transition={{ duration: 0.7, delay, ease }}
       whileHover={{ y: -6, rotateX: 2, rotateY: -2 }}
       style={{ transformPerspective: 1000 }}
-      className={`bg-white rounded-3xl border border-slate-200 p-7 overflow-hidden relative
+      className={`bg-white rounded-3xl border border-slate-200 p-7 lg:p-8 overflow-hidden relative
                   shadow-[0_1px_2px_rgba(15,23,42,0.04)]
                   hover:shadow-[0_32px_64px_-20px_rgba(15,23,42,0.16)] hover:border-slate-300
                   transition-[box-shadow,border-color] duration-300 ${className ?? ""}`}
@@ -340,7 +340,7 @@ function BentoCard({
 
 function BentoFeatures() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6">
       {/* AI evaluation — large card */}
       <BentoCard className="md:col-span-2">
         <div className="flex flex-col sm:flex-row gap-8 items-start">
@@ -592,7 +592,7 @@ export default function LandingPage() {
       <section
         ref={heroRef}
         onMouseMove={onHeroMouseMove}
-        className="relative bg-slate-950 pt-40 pb-0 overflow-hidden"
+        className="relative bg-slate-950 min-h-screen flex flex-col pt-28 pb-0 overflow-hidden"
       >
         {/* Grid lines */}
         <div
@@ -617,7 +617,8 @@ export default function LandingPage() {
         {/* Mouse spotlight */}
         <motion.div className="absolute inset-0 pointer-events-none" style={{ background: spotlight }} />
 
-        <div className="relative max-w-3xl mx-auto text-center px-6">
+        <div className="relative flex-1 flex flex-col justify-center w-full">
+        <div className="max-w-4xl mx-auto text-center px-6">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -640,7 +641,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6, ease }}
-            className="text-lg text-white/50 max-w-xl mx-auto mt-7 mb-11 leading-relaxed"
+            className="text-lg text-white/50 max-w-2xl mx-auto mt-7 mb-11 leading-relaxed"
           >
             Từ tìm kiếm, đánh giá độ phù hợp AI, tạo CV đến theo dõi ứng tuyển —
             tất cả trong một nền tảng, hoàn toàn miễn phí.
@@ -668,34 +669,33 @@ export default function LandingPage() {
           </motion.div>
         </div>
 
-        <HeroScene />
-
-        <div className="mt-20">
-          <Marquee />
+          <HeroScene />
         </div>
+
+        <Marquee />
       </section>
 
       {/* ============================ Stats counters ============================ */}
-      <section className="px-6 py-24 bg-white">
-        <Reveal className="max-w-4xl mx-auto">
+      <section className="px-6 sm:px-8 lg:px-12 py-20 sm:py-24 bg-white">
+        <Reveal className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 border-y border-slate-200 divide-x divide-slate-200">
-            <div className="py-9 px-6 text-center">
+            <div className="py-10 px-6 text-center">
               <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-1.5">
                 <CountUp to={4} suffix="+" />
               </div>
               <div className="text-xs text-slate-500 font-medium">Cổng việc làm</div>
             </div>
-            <div className="py-9 px-6 text-center">
+            <div className="py-10 px-6 text-center">
               <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-1.5">
                 <CountUp to={10} suffix="k+" />
               </div>
               <div className="text-xs text-slate-500 font-medium">Việc làm mới / tuần</div>
             </div>
-            <div className="py-9 px-6 text-center">
+            <div className="py-10 px-6 text-center">
               <div className="text-3xl md:text-4xl font-bold text-blue-600 mb-1.5">AI</div>
               <div className="text-xs text-slate-500 font-medium">Đánh giá tự động</div>
             </div>
-            <div className="py-9 px-6 text-center">
+            <div className="py-10 px-6 text-center">
               <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-1.5">
                 <CountUp to={100} suffix="%" />
               </div>
@@ -706,8 +706,8 @@ export default function LandingPage() {
       </section>
 
       {/* ============================ Bento features ============================ */}
-      <section className="py-24 px-6 bg-slate-50 border-y border-slate-200/70">
-        <div className="max-w-6xl mx-auto">
+      <section className="py-24 sm:py-28 px-6 sm:px-8 lg:px-12 bg-slate-50 border-y border-slate-200/70">
+        <div className="max-w-7xl mx-auto">
           <Reveal className="text-center mb-16">
             <p className="text-xs font-semibold text-blue-600 tracking-[0.2em] uppercase mb-4">Tính năng</p>
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight mb-3">
@@ -722,8 +722,8 @@ export default function LandingPage() {
       </section>
 
       {/* ============================= How it works ============================= */}
-      <section className="py-28 px-6 bg-white">
-        <div className="max-w-5xl mx-auto">
+      <section className="py-28 px-6 sm:px-8 lg:px-12 bg-white">
+        <div className="max-w-6xl mx-auto">
           <Reveal className="text-center mb-20">
             <p className="text-xs font-semibold text-blue-600 tracking-[0.2em] uppercase mb-4">Cách hoạt động</p>
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">
@@ -735,7 +735,7 @@ export default function LandingPage() {
       </section>
 
       {/* ================================= CTA ================================= */}
-      <section className="relative bg-slate-950 py-32 px-6 overflow-hidden">
+      <section className="relative bg-slate-950 py-36 px-6 sm:px-8 lg:px-12 overflow-hidden">
         <div className="absolute -top-24 left-1/3 w-[420px] h-[420px] bg-blue-600/25 rounded-full blur-[120px] animate-aurora pointer-events-none" />
         <div
           className="absolute bottom-0 right-1/4 w-[360px] h-[360px] bg-cyan-500/15 rounded-full blur-[110px] animate-aurora pointer-events-none"
@@ -750,7 +750,7 @@ export default function LandingPage() {
             maskImage: "radial-gradient(ellipse 70% 70% at 50% 50%, black, transparent)",
           }}
         />
-        <Reveal className="relative max-w-2xl mx-auto text-center">
+        <Reveal className="relative max-w-3xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-5 leading-tight">
             Sẵn sàng cho{" "}
             <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-400 bg-clip-text text-transparent">
@@ -772,7 +772,7 @@ export default function LandingPage() {
 
       {/* =============================== Footer ================================ */}
       <footer className="relative bg-white overflow-hidden">
-        <div className="max-w-6xl mx-auto px-6 py-10 flex items-center justify-between relative z-10">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-10 flex items-center justify-between relative z-10">
           <div className="flex items-baseline gap-2">
             <span className="font-bold text-slate-900 text-base tracking-tight">Vica</span>
             <span className="text-slate-400 text-sm">· 2025</span>
